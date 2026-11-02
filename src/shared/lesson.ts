@@ -112,12 +112,12 @@ export const GUIDE = [
   },
   {
     group: 'Streaming text',
-    name: 'Deltas â‰  completed blocks',
+    name: 'Deltas ≠ completed blocks',
     text: 'stream_event text deltas are provisional. Completed assistant blocks form the conversation. This app keeps those views separate so it never concatenates both into one answer.',
   },
   {
     group: 'Outcome',
-    name: 'result â‰  task_progress',
+    name: 'result ≠ task_progress',
     text: 'Only a result supplies the final turn outcome. Progress describes work underway; a tool error or denial can still lead to a successful final explanation.',
   },
   {
@@ -132,7 +132,7 @@ export const GUIDE = [
   },
   {
     group: 'Tool lifecycle',
-    name: 'PreToolUse â†’ PostToolUse or failure',
+    name: 'PreToolUse → PostToolUse or failure',
     text: 'Log callbacks with session and tool-use IDs. A PreToolUse deny prevents execution. The actual post-tool callback depends on the runtime outcome; inspect observed evidence rather than guessing from final text.',
   },
   {
@@ -148,7 +148,7 @@ export const GUIDE = [
   {
     group: 'Version contract',
     name: 'Hook matcher objects',
-    text: 'SDK 0.3.310 uses hooks: { PostToolUse: [{ matcher, hooks: [callback] }] }. The lessonâ€™s conceptual bare callback array must be adapted to that shape.',
+    text: 'SDK 0.3.310 uses hooks: { PostToolUse: [{ matcher, hooks: [callback] }] }. The lesson’s conceptual bare callback array must be adapted to that shape.',
   },
 ] as const;
 export const QUIZ = [
