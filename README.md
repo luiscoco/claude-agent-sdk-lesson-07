@@ -1,4 +1,4 @@
-# Lesson 7 — Message & Hook Observatory
+# Lesson 7 Message & Hook Observatory
 
 A runnable companion to **Claude Agent SDK TypeScript version 0.3.310**, Lesson 7: **Messages and Hooks**. Observe a typed message stream, step through explicit teaching fixtures, and compare hook callbacks with actual tool execution.
 
