@@ -2,6 +2,37 @@
 
 A runnable companion to **Claude Agent SDK TypeScript version 0.3.310**, Lesson 7: **Messages and Hooks**. Observe a typed message stream, step through explicit teaching fixtures, and compare hook callbacks with actual tool execution.
 
+![Refreshed course interface with larger text](docs/visual-refresh-desktop.png)
+
+## Visual style and reading controls
+
+The interface follows the course reference apps: pale blue backgrounds, navy text, orange heading accents, blue controls, rounded panels, and the course astronaut mascot. The screenshot above shows the refreshed design.
+
+| Reading element            | Default presentation                                             |
+| -------------------------- | ---------------------------------------------------------------- |
+| Body text                  | **21 px**, with comfortable line spacing                         |
+| Labels and supporting text | Approximately **18–20 px** or larger                             |
+| Code                       | Approximately **20 px**, wrapping within its panel               |
+| Larger setting             | **24 px** base text, with scalable labels, controls and headings |
+
+Use **Text size → Larger** in the page header when you need bigger text. Choose **Comfortable** to return to the default size. The choice is saved in this application's browser storage and remains after a reload; it makes no API request. Browser zoom is also available.
+
+On phones and narrower windows, navigation and work areas stack so controls and text remain usable. You can open **Lesson focus & author** where that panel is available. Lesson activities, practice/live distinctions, permissions and server-side key handling continue to work as described below.
+
+The shared presentation files are `src/client/course-theme.css` (palette and layout), `src/client/course-theme.ts` (reading preference and course presentation), and `public/course-astronaut.png` (reference mascot). See [visual style details](docs/visual-style.md) for the reference sources and a full-size screenshot.
+
+### Update an existing checkout
+
+Pull the latest changes and restart the local app:
+
+```sh
+git pull --ff-only
+npm ci
+npm run dev
+```
+
+Refresh the browser tab to load the updated interface. The lesson-specific local URL and first-run instructions are listed below.
+
 ## Start here
 
 Use Node.js **22.14+** (or 24) and npm.
@@ -14,8 +45,6 @@ npm run dev
 ```
 
 Open **http://127.0.0.1:4371**. Choose a scenario, click **Load replay**, and use **Next event** or **Play**. Replay works without an account or API key and makes no model calls.
-
-![Refreshed course interface with larger text](docs/visual-refresh-desktop.png)
 
 ## What students will learn
 
@@ -113,5 +142,3 @@ On a workstation with Chrome already installed, PowerShell users can set `$env:P
 - Installed `@anthropic-ai/claude-agent-sdk` **0.3.310** TypeScript declarations define the exact contract used here. Current online guides may describe a newer release.
 
 MIT license. Public student repository; no instructor credentials are included.
-
-See [visual style and reading controls](docs/visual-style.md) for the refreshed reference palette, larger typography, and persistent text-size setting.
