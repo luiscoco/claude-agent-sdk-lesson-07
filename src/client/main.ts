@@ -1,6 +1,7 @@
 import './style.css';
 import './course-theme.css';
 import './course-theme.js';
+import { renderMarkdown } from './markdown.js';
 import {
   DEFAULT_CONFIG,
   SCENARIOS,
@@ -26,7 +27,7 @@ document.querySelector('#app')!.innerHTML = `
     '',
   )}</select></label><p id="scenario-help" class="muted"></p><label class="check"><input type="checkbox" id="hooks" checked> includeHookEvents</label><label class="check"><input type="checkbox" id="partials" checked> includePartialMessages</label><p id="key" class="muted">Checking local configuration…</p><button id="run" class="primary">Load replay</button><div class="actions"><button id="play">Play</button><button id="pause">Pause</button><button id="next">Next event</button><button id="stop" disabled>Stop live</button></div><p id="position" class="muted">No events loaded</p><hr><p><strong>Three separate observations</strong></p><p class="muted">SDK lifecycle frames, host hook callbacks and tool handler execution each have their own evidence. A hook ID is not a tool-use ID.</p><button id="export">Export observed trace ↓</button></aside>
 <div class="observation"><div class="notice" id="notice" role="status">Replay uses scripted SDK-shaped fixtures. It executes no query, hook or tool.</div><div class="metrics"><div><b id="messages">0</b><span>SDK / fixture frames</span></div><div><b id="callbacks">0</b><span>Callback rows</span></div><div><b id="resets">0</b><span>Conversation resets</span></div></div>
-<section class="panel"><div class="section-head"><h2>Conversation window</h2><span id="identity" class="tag">No session</span></div><p id="progress" class="progress">No task progress observed.</p><div id="conversation" class="conversation"><p class="muted">Load a scenario to begin.</p></div><details><summary>Provisional streaming draft (separate from completed blocks)</summary><pre id="draft">No text deltas.</pre></details><div class="outcome"><p class="eyebrow">FINAL TURN OUTCOME</p><p id="final">Awaiting a result message.</p></div></section>
+<section class="panel"><div class="section-head"><h2>Conversation window</h2><span id="identity" class="tag">No session</span></div><p id="progress" class="progress">No task progress observed.</p><div id="conversation" class="conversation"><p class="muted">Load a scenario to begin.</p></div><details><summary>Provisional streaming draft (separate from completed blocks)</summary><pre id="draft">No text deltas.</pre></details><div class="outcome"><p class="eyebrow">FINAL TURN OUTCOME</p><div id="final">Awaiting a result message.</div></div></section>
 <section class="panel"><h2>Execution evidence</h2><p id="evidence" class="muted">Replay rows illustrate an ordering; actual executions: not applicable.</p></section>
 <section class="panel"><div class="section-head"><h2>Event audit</h2><label>Filter lane<select id="filter"><option value="all">All lanes</option>${['sdk', 'callback', 'policy', 'handler', 'host'].map((x) => `<option>${x}</option>`).join('')}</select></label></div><p class="muted">Latest 200 normalized observations. Filtering never changes the conversation or final result.</p><div id="events" class="events"></div></section></div></div></section>
 <section id="guide" class="view" hidden><div class="guide-grid">${GUIDE.map((x) => `<article class="panel"><p class="eyebrow">${x.group}</p><h2>${x.name}</h2><p>${x.text}</p></article>`).join('')}</div><article class="panel"><h2>Read the actual callbacks</h2><p>SDK 0.3.310 requires matcher objects containing callback arrays. Logging returns no approval. The blocked scenario adds an explicit deny decision.</p><details id="source-detail"><summary>Open src/server/hooks.ts</summary><pre id="source">Loading…</pre></details><p class="muted">Observed live behavior: configured SessionStart and Notification callbacks were not invoked in the five verification runs; no hook lifecycle frames were emitted in those runs, even with includeHookEvents enabled. The replay illustrates those documented families without claiming they occurred live.</p></article></section>
@@ -39,7 +40,8 @@ let state = initialState(),
   controller: AbortController | undefined,
   report: Report | undefined,
   submitted: Config = { ...DEFAULT_CONFIG },
-  origin = 'replay';
+  origin = 'replay',
+  renderedFinal: string | undefined;
 const mode = () => $<HTMLSelectElement>('mode').value;
 const config = (): Config => ({
   scenario: $<HTMLSelectElement>('scenario').value as Config['scenario'],
@@ -48,6 +50,12 @@ const config = (): Config => ({
 });
 function notice(text: string) {
   $('notice').textContent = text;
+}
+// Render model text as Markdown, keeping a plain label at the start of the first paragraph.
+function labelled(target: HTMLElement, label: Node, markdown: string) {
+  renderMarkdown(target, markdown);
+  const first = target.firstElementChild;
+  (first?.tagName === 'P' ? first : target).prepend(label);
 }
 function pause() {
   clearInterval(timer);
@@ -61,17 +69,30 @@ function render() {
   $('progress').textContent = state.progress || 'No task progress observed.';
   $('conversation').replaceChildren(
     ...state.conversation.map((c) => {
-      const p = document.createElement('p');
+      const assistant = c.role === 'assistant';
+      const p = document.createElement(assistant ? 'div' : 'p');
       const b = document.createElement('b');
       b.textContent = c.role + ' · ';
-      p.append(b, document.createTextNode(c.text));
+      if (assistant) {
+        p.className = 'markdown';
+        labelled(p, b, c.text);
+      } else p.append(b, document.createTextNode(c.text));
       return p;
     }),
   );
   $('draft').textContent = state.draft || 'No text deltas.';
-  $('final').textContent = state.final
+  const final = state.final
     ? `${state.final.ok ? 'Completed' : 'Unsuccessful'} · ${state.final.text}`
     : 'Awaiting a result message.';
+  // Re-render only when the text changes so playback doesn't reset a reader's selection.
+  if (final !== renderedFinal) {
+    renderedFinal = final;
+    // Successful results carry model text; failures list SDK errors and stay plain text.
+    if (state.final?.ok)
+      labelled($('final'), document.createTextNode('Completed · '), state.final.text);
+    else $('final').textContent = final;
+    $('final').classList.toggle('markdown', Boolean(state.final?.ok));
+  }
   $('position').textContent =
     origin === 'replay'
       ? `${cursor} / ${frames.length} scripted events observed`
