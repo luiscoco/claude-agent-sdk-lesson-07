@@ -15,7 +15,7 @@ npm run dev
 
 Open **http://127.0.0.1:4371**. Choose a scenario, click **Load replay**, and use **Next event** or **Play**. Replay works without an account or API key and makes no model calls.
 
-![The message and hook observatory](docs/observatory.png)
+![Refreshed course interface with larger text](docs/visual-refresh-desktop.png)
 
 ## What students will learn
 
@@ -113,3 +113,5 @@ On a workstation with Chrome already installed, PowerShell users can set `$env:P
 - Installed `@anthropic-ai/claude-agent-sdk` **0.3.310** TypeScript declarations define the exact contract used here. Current online guides may describe a newer release.
 
 MIT license. Public student repository; no instructor credentials are included.
+
+See [visual style and reading controls](docs/visual-style.md) for the refreshed reference palette, larger typography, and persistent text-size setting.
